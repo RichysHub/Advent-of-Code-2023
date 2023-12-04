@@ -59,3 +59,103 @@ using <https://github.com/Mikescher/Befunge_Number_Representations>:
   BAA   = 676     = 47*2-:*
   BAAA  = 17576   = "h~+"+*
   BAAAA = 456976  = "h~a,"*+*
+
+
+stack when getting input:
+
+current 5-letter window, base-26 encoded, often 0
+current running total
+----------------------
+
+any time we need to access the running total, we don't need out 5-letter window
+
+Pseudocode theory of execution
+
+should bucket out in order
+gt vs lt, gt doesn't require a swap
+
+[input]
+  - is -1, end of input, go to [end-of-input]
+  - is 10, newline, go to [end-of-line]
+
+  - greater than "z", discard, discard window
+  
+    - new window
+    - go to [input]
+
+  - greater than "a", go to [letter]
+  - greater than "9", discard, discard window
+
+    - new window
+    - go to [input]
+      (this does discard A-Z, but strictly spec desires to)
+
+  - greater than "0", go to [digit]
+  - else, discard, discard window
+
+    - new window
+    - go to [input]
+
+
+[digit]
+  - discard the window
+  - push to tens-place
+  - self modify to sever previous line from execution path
+  - push to ones-place
+
+  - new window
+  - go to [input]
+
+
+[end-of-line]
+  - discard the window
+  - read from tens-place, ones-place
+  - manipulate to turn into single stack value
+  - add to total
+  - not directed to {TERMINATE} yet
+  - clear tens-place, ones-place
+  - self modify [digit] to re-enable tens-place push
+
+  - new window
+  - go to [input]
+
+
+[end-of-input]
+  - self modify [end-of-line] to terminate at {TERMINATE}
+  - go to [end-of-line]
+
+
+[letter]
+  (we want to update our window, adding this letter to the end of it)
+
+  - encode base-26, by subtracting "a"
+  - swap under current window
+  - window % BAAAA
+    (take last 4 letters of window)
+  - window * 26
+    (shift window contents over)
+  - window + letter
+    (append new letter)
+
+  (does our window contain a number word?)
+  (organisation and flow of this is probably the hardest to optimise)
+
+  (check for eight, three, seven)
+
+  - dupe window
+  - push encoded word
+  - subtract, if zero, push digit and go to [digit]
+
+  (check for four, five, nine)
+  - dupe window
+  - % BAAAA
+  - push encoded word
+  - subtract, if zero, push digit and go to [digit]
+
+  (check for one, two, six)
+  - dupe window
+  - % BAAA
+  - push encoded word
+  - subtract, if zero, push digit and go to [digit]
+
+  (a lot of this is similar; tricky to be smart though)
