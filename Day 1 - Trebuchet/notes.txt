@@ -1,133 +1,61 @@
-one
-t
- wo
- hree
-f
- our
- ive
-s
- ix
- even
- 
-eight
-nine
+use 00-25, and then x26
+"zzzzz" -> 11881375, well within max value
 
-eerht
-enin
-eno
-evif
-neves
-owt
-ruof
-thgie
-xis
+can get back values with division and modulo
+<https://www.dcode.fr/base-26-cipher>
 
-ugly:
-have a 5char running window on the grid
-on each character in:
-    update the window
-    check if it's any of the valid inputs
+int-division by powers of 26 removes digits, ie characters
+"two" // 26 -> "tw"
+"two" // 26*26 -> "t"
 
-    can do a run-down check thing?
+These powers of 26 are the encoding of "BA", "BAA", etc
+last n-digits can be obtained by % B, followed by n As
 
-    """""
-    agsft
-    three
-    """""
-    -----
+"three" // 456976 -> "t"
+"three" % 456976 -> "hree"
 
-    from top down, adds character to stack, then target, subs, if all zero, it's a match
-    has to do for all 9 options. 4 and 3 length have to handle the early-out on check.
+26 is an awkward # to get on stack, 47*2-, quicker to grab with something like 11g
 
-sneaky:
-some form of encoding of the characters:
-    if we check they're a-z, we can then use more of the value range to encode.
-    max value is 2,147,483,647, 7FFFFFFF16
+some carefulness needed for handling first letter and generating the encoded value on stack
+probably a sentinel value on top of the total? 
+get input, move window, add input
+check full window against "eight", "seven", "three".
+check window % "BAAAA" against "four", "five, "nine" 
+check window % "BAAA" against "six", "one", "two"
+repeat
 
-    Would lead to single stack entry encoding 5 characters
-    updating this to the next 5-window, and also checking for the 4 and 3 letter words: tricky?
-    benefit of keeping entire windo in a single stack entry-> manipulation easier
+checks are just: dupe, push value of "six" etc, subtract, check for 0.
 
-    use 00-25, and then x26
-    can get back values with division and modulo
-    <https://www.dcode.fr/base-26-cipher>
+getting base-26 encoded number words onto the stack.
 
-    int-division by powers of 26 removes digits, ie characters
-    "two" // 26 -> "tw"
-    "two" // 26*26 -> "t"
+naive:
+11g:"ta"-*"wa"-+\*"oa"-+  24 cells vs 2"OU"** 7 cells
 
-    456976 is therefore useful for pulling first of 5 characters out
+hand worked improvements for conciseness:
+  one = 9806       =  b*d + 6
+  two = 13430      =  O*U*2
+  three = 8817176  =  E*~*~*8 + 53624
+  four = 97881     =  ;*O*3*7
+  five = 93838     =  8*f*s - 2
+  six = 12399      =  |*d - 1
+  seven = 8310185  =
+  eight = 1972769  =
+  nine = 234238    =  z*x*8*2 - 2
 
-    "three" // 456976 -> "t"
-    "three" - ("t" * 456976) -> "hree"
-    "hree" * 26 -> "hreea"
-    "hreea" + "g" -> "hreeg"
+solutions for one, two, four, five, six are potentially optimal
 
-    "three" % 456976 -> "hree"
+using <https://github.com/Mikescher/Befunge_Number_Representations>:
+  one   = 6"bd"*+
+  two   = 2"UO"**
+  three = "OQ;-)"***\-
+  four  = ";0"37***
+  five  = "fs"8**2-
+  six   = "|d"*1-
+  seven = "Ir//!"***\-
+  eight = "qV~M"+**6+9+
+  nine  = "\C&"**6+
 
-    "zzzzz" -> 11881375, well within max value
-
-    26 is an awkward # to get on stack, 47*2-, quicker to grab with something like 11g
-
-
-    might be useful in general for condensing a string on the stack to swap under something.
-
-
-    some carefulness needed for handling first letter and generating the encoded value on stack
-    probably a sentinel value on top of the total? 
-    get input, move window, add input
-    check full window against "eight", "seven", "three".
-    check window % "zzzz" against "four", "five, "nine"  
-    check window % "zzz" against "six", "one", "two"
-    repeat
-
-    checks are just: dupe, push value of "six" etc, subtract, check for 0.
-
-
-    getting base-26 encoded number words onto the stack.
-
-    naive:
-
-    11g:"ta"-*"wa"-+\*"oa"-+  24 cells vs 2"OU"** 7 cells
-
-    hand worked improvements for conciseness:
-      one = 9806        =  b*d + 6
-      two = 13430       =  O*U*2
-    three = 8817176     =  E*~*~*8 + 53624
-     four = 97881       =  ;*O*3*7
-     five = 93838       =  8*f*s - 2
-      six = 12399       =  |*d - 1
-    seven = 8310185     =
-    eight = 1972769     =
-     nine = 234238      = z*x*8*2 - 2
-
-
-    using <https://github.com/Mikescher/Befunge_Number_Representations>:
-    one - not more optimal use 6"bd"*+
-    two - not more optimal use 2"UO"**
-    three - "OQ;-)"***\-
-    four - not more optimal use ";0"37***
-    five - not more optimal use "fs"8**2-
-    six - not more optimal use "|d"*1-
-    seven - "Ir//!"***\-
-    eight - "qV~M"+**6+9+
-    nine - "\C&"**6+ - more optimal
-
-    BA    = 26      = 47*2-
-    BAA   = 676     = 47*2-:*
-    BAAA  = 17576   = "h~+"+*
-    BAAAA = 456976  = "h~a,"*+*
-
-logical:
-Sentinel value before pulling input: denoted §
-if number, it falls back to earlier solution action.
-
-Pull from input onto stack, until you hit a viable end character (enortx)
-max characters need check/keep is 5
-
-dtwo4
-
-stack: §dt
-place t down, is previous an h? no, pick t back up?
-stack: §dtwo
-place o down, is previous a w? yes, put w down, is previous a t? yes -> 2.
+  BA    = 26      = 47*2-
+  BAA   = 676     = 47*2-:*
+  BAAA  = 17576   = "h~+"+*
+  BAAAA = 456976  = "h~a,"*+*
