@@ -48,7 +48,7 @@ using <https://github.com/Mikescher/Befunge_Number_Representations>:
   one   = 6"bd"*+
   two   = 2"UO"**
   three = "OQ;-)"***\-
-  four  = ";0"37***
+  four  = ";O"37***
   five  = "fs"8**2-
   six   = "|d"*1-
   seven = "Ir//!"***\-
