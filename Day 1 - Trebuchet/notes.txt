@@ -64,6 +64,8 @@ using <https://github.com/Mikescher/Befunge_Number_Representations>:
 stack when getting input:
 
 current 5-letter window, base-26 encoded, often 0
+because no number-words start with a, this won't give false positives
+if matching with "alpha" were needed, for example, would move to base-27
 current running total
 ----------------------
 
@@ -83,14 +85,14 @@ gt vs lt, gt doesn't require a swap
     - new window
     - go to [input]
 
-  - greater than "a", go to [letter]
+  - greater than "`", go to [letter] (>="a")
   - greater than "9", discard, discard window
 
     - new window
     - go to [input]
       (this does discard A-Z, but strictly spec desires to)
 
-  - greater than "0", go to [digit]
+  - greater than "/", go to [digit] (>= "0")
   - else, discard, discard window
 
     - new window
