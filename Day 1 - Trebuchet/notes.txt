@@ -92,20 +92,21 @@ gt vs lt, gt doesn't require a swap
     - go to [input]
       (this does discard A-Z, but strictly spec desires to)
 
-  - greater than "/", go to [digit] (>= "0")
+  - greater than "/", go to [see-digit] (>= "0")
   - else, discard, discard window
 
     - new window
     - go to [input]
 
 
-[digit]
+[see-digit]
   - discard the window
+  - new window
+[digit]
   - push to tens-place
   - self modify to sever previous line from execution path
   - push to ones-place
 
-  - new window
   - go to [input]
 
 
