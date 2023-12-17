@@ -42,4 +42,21 @@ in all cases, check against reference value
 if passes, loop back, unless newline
 if newline, add game # to count
 
+alternative to counting letters, is use first letter, and index off that
+afterwards, can either go until [,;/n] or do some arithmatic
 
+r = 114 = 98 + 17
+g = 103 = 98 + 5 <- this sets our max modulus at 6
+b = 98 = 98 + 0 
+r/6 = 19
+g/6 = 17
+b/6 = 16
+
+number
+letter
+duplicate
+fetch offset
+move offset
+fetch max for color
+compare
+process next character
