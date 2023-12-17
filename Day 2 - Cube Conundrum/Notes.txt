@@ -1,0 +1,45 @@
+Part 1
+
+Each line is of format
+Game #: # color, # color ... ; # color, # color, # color ... /n
+where each # could be a multidigit number
+
+Some things to note:
+- every line starts "Game ", which we just toss
+- Game number is colon terminated
+- Three colors of cubes use consistant color words
+- Color words "red", "blue", "green" each have a unique number of letters
+
+Assume we have at least 1 game in input
+
+For easiest implementation, we can ignore the actual letters, and just count them
+3 letters -> red
+4 letters -> blue
+5 letters -> green
+
+12 red, 13 green, 14 blue 
+
+if we count number of letters, we can directly use that value to know which cell to grab our comparison value from, ie store 12 in (3, X), 14 in (4, X) and 13 in (5, X)
+
+If we reach the end of the line under normal operation, add the game number to the total
+If ever a value > max is seen, we go into turbo pass mode, looking for that newline, and discard the game # in the process.
+
+I had not realised. & handles mutliple-digit integers just fine. Perfect!
+Well formatted input means we know when an integer is coming, and we can gracefully accept it.
+
+Pseudocode:
+
+
+Input and remove everything up until the game number
+- Can go until we remove the previous space
+input and discard the colon and space
+input # for color with &
+input characters, counting them until:
+- comma
+- semicolon
+- newline
+in all cases, check against reference value
+if passes, loop back, unless newline
+if newline, add game # to count
+
+
