@@ -1,65 +1,73 @@
 Part 1
 
-Each line is of format
+Each line is of format:
 Game #: # color, # color ... ; # color, # color, # color ... /n
 where each # could be a multidigit number
+Well formatted input means we know when an integer is coming
 
 Some things to note:
 - every line starts "Game ", which we just toss
 - Game number is colon terminated
 - Three colors of cubes use consistant color words
-- Color words "red", "blue", "green" each have a unique number of letters
+- Colors each start with a different letter
 
 Assume we have at least 1 game in input
 
-For easiest implementation, we can ignore the actual letters, and just count them
-3 letters -> red
-4 letters -> blue
-5 letters -> green
-
+Limits on allowed cube quantities:
 12 red, 13 green, 14 blue 
 
-if we count number of letters, we can directly use that value to know which cell to grab our comparison value from, ie store 12 in (3, X), 14 in (4, X) and 13 in (5, X)
-
-If we reach the end of the line under normal operation, add the game number to the total
-If ever a value > max is seen, we go into turbo pass mode, looking for that newline, and discard the game # in the process.
-
-I had not realised. & handles mutliple-digit integers just fine. Perfect!
-Well formatted input means we know when an integer is coming, and we can gracefully accept it.
-
-Pseudocode:
-
-
-Input and remove everything up until the game number
-- Can go until we remove the previous space
-input and discard the colon and space
-input # for color with &
-input characters, counting them until:
-- comma
-- semicolon
-- newline
-in all cases, check against reference value
-if passes, loop back, unless newline
-if newline, add game # to count
-
-alternative to counting letters, is use first letter, and index off that
-afterwards, can either go until [,;/n] or do some arithmatic
-
+first letters of colors, in ASCII
 r = 114 = 98 + 17
 g = 103 = 98 + 5 <- this sets our max modulus at 6
 b = 98 = 98 + 0 
 
+Integer division can get us some useful offsets to index on
 r/6 = 19
 g/6 = 17
 b/6 = 16
 
-r/5 = 22
-g/5 = 20
-b/5 = 19
+for each of these indexes, we have 2 values stored on grid:
+max number allowed (stored as # * 3)
 
-r/4 = 28
-g/4 = 25
-b/4 = 24
+r = 12 * 3 = 36 = $
+g = 13 * 3 = 39 = '
+b = 14 * 3 = 42 = *
+
+and an offset, defined as number of letters in the color word -1
+
+r = 2
+g = 4
+b = 3
+
+Indexed characters are within the code space, and are used in execution when possible; the $ is used as a discard instruction, string mode is used to pass the other two safetly.
+
+Pseudocode:
+
+[begin]
+Input and discard until the game number
+Input game number with & operator
+Input and discard the colon and space
+Input # for color with &
+Get first character of color
+Advance through input until end of color word, using lookup value (§)
+Lookup max allowed for color and compare
+    If passes, loop back, unless newline or EOF
+        If newline, add game # to count, back to [begin]
+        If EOF, add game # to count, and output
+    If fail, input and discard line until newline or EOF
+        Newline: back to [begin]
+        EOF, output
+
+§ looks a little out of order, but is done for reasons of stack: at that point
+
+Stack
+
+color index (color first letter/6)
+# of color
+Game #
+Running total
+
+If we compare first, we lose the color index, so we instead duplicate our index, move, then compare
 
 number
 letter
